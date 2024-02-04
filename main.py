@@ -71,7 +71,7 @@ def search_word_in_file(word: str, ext: str, dict_path: str = DEFAULT_PATH) -> d
     return found
 
 
-def search_word_in_all(word: str, dict_path: str = DEFAULT_PATH) -> list[str]:
+def search_word(word: str, dict_path: str = DEFAULT_PATH) -> list[str]:
     '''
     This function takes in a word string and sets up multiple threads which
     call `search_word_in_file` on each wordnet index file.\n
