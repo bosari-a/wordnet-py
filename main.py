@@ -1,3 +1,4 @@
+from pprint import pprint
 import re
 import os
 from concurrent.futures import ThreadPoolExecutor
@@ -17,9 +18,11 @@ TYPES_EXTS = {
 }
 '''This dictionary specifies the wordnet file extensions
 and the corresponding word type labels found in index files'''
+DEFAULT_PATH = "./dict"
+'''This is the default path to the wordnet database.'''
 
 
-def search_word_in_file(word: str, ext: str, dict_path: str = "./dict") -> dict | None:
+def search_word_in_index(word: str, ext: str, dict_path: str = DEFAULT_PATH) -> dict | None:
     '''This functions searches for `word` provided in the arguments
     in the index.`ext` file where `ext` is also an argument.\n
     If a word is found the it returns a `dict` with the relevant information:
@@ -45,8 +48,31 @@ def search_word_in_file(word: str, ext: str, dict_path: str = "./dict") -> dict 
             found = {
                 "word": word.strip().lower(),
                 "buffer_offsets": [int(off) for off in BUFFER_OFF.findall(line)],
-                "word_type": TYPES_EXTS[word_type]
+                "word_type": word_type
             }
     return found
 
 
+def get_word_meaning(word: dict, dict_path: str = DEFAULT_PATH):
+    '''This function mutates the `word` dict by
+    adding `definitions` key whose value is different
+    definitions of the word (if found).'''
+    data_path = os.path.join(
+        dict_path, f"data.{TYPES_EXTS[word['word_type']]}")
+    with open(data_path, "r", encoding="utf-8") as fd:
+        buffer_offsets = word.get("buffer_offsets", [])
+        for offset, num in zip(buffer_offsets, range(1, len(buffer_offsets)+1)):
+            fd.seek(offset, 0)
+            definition = "".join(fd.readline().split("|")[-1]).strip()
+            word["definitions"] = word.get(
+                "definitions", [])+[f"({TYPES_EXTS[word['word_type']]} {num}) {definition}"]
+
+
+def get_all_meanings(word: str, dict_path: str = DEFAULT_PATH):
+    '''
+    This function takes in a word string and sets up multiple threads which
+    call `search_word_in_index` on each wordnet index file and uses
+    the resulting `word_type` and `buffer_offsets` from each thread to
+    parse the data files and get the word definitions for each word type.
+    '''
+    return
