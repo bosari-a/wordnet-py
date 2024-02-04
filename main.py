@@ -102,7 +102,7 @@ def get_words_in_file(ext: str, dict_path: str = DEFAULT_PATH) -> list[str]:
     return words
 
 
-def get_words(dict_path: str = DEFAULT_PATH):
+def get_words(dict_path: str = DEFAULT_PATH) -> list[str]:
     '''Creates multiple threads that parse all
     wordnet index files and returns a list
     of all the words.'''
