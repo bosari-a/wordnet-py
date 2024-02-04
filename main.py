@@ -87,3 +87,18 @@ def search_word(word: str, dict_path: str = DEFAULT_PATH) -> list[str]:
                 definitions += res.get("definitions", [])
     return definitions
 
+
+def get_words_in_file(ext: str, dict_path: str = DEFAULT_PATH) -> list:
+    '''Parses index.`ext` file and returns a list of all the words there.
+    For example, calling with `ext="noun"` will return a `list` 
+    of all nouns.'''
+    index_file = os.path.join(dict_path, f"index.{ext}")
+    words = []
+    with open(index_file, "r", encoding="utf-8") as fd:
+        for line in fd.readlines():
+            res = re.search(WORD_REGEXP, line)
+            if res:
+                words += [res.group()]
+    return words
+
+def get_words()
