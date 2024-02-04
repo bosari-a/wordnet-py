@@ -56,7 +56,7 @@ def search_word_in_file(word: str, ext: str, dict_path: str = DEFAULT_PATH) -> d
         # 3. search for the word in the file
         i = bsearch.binary_search(data=lines, find=word, regexp=WORD_REGEXP)
         # 4. if found, return a dict with the relevant information otherwise return None
-        if i:
+        if i is not None:
             line = lines[i]
             word_type_match = WORD_TYPE.search(line)
             word_type = ""
@@ -88,7 +88,7 @@ def search_word(word: str, dict_path: str = DEFAULT_PATH) -> list[str]:
     return definitions
 
 
-def get_words_in_file(ext: str, dict_path: str = DEFAULT_PATH) -> list:
+def get_words_in_file(ext: str, dict_path: str = DEFAULT_PATH) -> list[str]:
     '''Parses index.`ext` file and returns a list of all the words there.
     For example, calling with `ext="noun"` will return a `list` 
     of all nouns.'''
@@ -101,4 +101,16 @@ def get_words_in_file(ext: str, dict_path: str = DEFAULT_PATH) -> list:
                 words += [res.group()]
     return words
 
-def get_words()
+
+def get_words(dict_path: str = DEFAULT_PATH):
+    '''Creates multiple threads that parse all
+    wordnet index files and returns a list
+    of all the words.'''
+    words = []
+    with ThreadPoolExecutor() as tp_exec:
+        for ext in TYPES_EXTS.values():
+            future = tp_exec.submit(get_words_in_file, ext, dict_path)
+            res = future.result()
+            if res:
+                words += res
+    return words
