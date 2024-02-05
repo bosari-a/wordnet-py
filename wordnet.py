@@ -1,4 +1,3 @@
-from pprint import pprint
 import re
 import os
 from concurrent.futures import ThreadPoolExecutor
